@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Database Layer Presentation</title>
+
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --bg: #0f172a;
+  --bg-secondary: #111827;
+  --surface: #1e293b;
+  --surface-light: #334155;
+  --card: rgba(255, 255, 255, 0.06);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --primary: #38bdf8;
+  --primary-dark: #0ea5e9;
+  --accent: #22c55e;
+  --text: #f8fafc;
+  --muted: #cbd5e1;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Cairo", sans-serif;
+  background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.8;
+  padding: 30px 16px;
+}
+
+.presentation {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.slide {
+  position: relative;
+  height: 100vh;
+  background: linear-gradient(135deg, var(--bg-secondary), var(--surface));
+  border: 1px solid var(--card-border);
+  border-radius: 28px;
+  padding: 40px 32px 70px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.slide::before {
+  content: "";
+  position: absolute;
+  top: -120px;
+  left: -120px;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.18), transparent 70%);
+  border-radius: 50%;
+}
+
+.slide::after {
+  content: "";
+  position: absolute;
+  bottom: -120px;
+  right: -120px;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.14), transparent 70%);
+  border-radius: 50%;
+}
+
+.slide-header {
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 2;
+}
+
+.slide-header h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 10px;
+  display: inline-block;
+  position: relative;
+}
+
+.slide-header h2::after {
+  content: "";
+  display: block;
+  width: 70%;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  margin-top: 8px;
+}
+
+.slide-content {
+  position: relative;
+  z-index: 2;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 160px);
+  text-align: center;
+}
+
+.hero-slide h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: 12px;
+  font-weight: 800;
+}
+
+.hero-slide h2 {
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  color: var(--muted);
+  margin-bottom: 28px;
+  font-weight: 600;
+}
+
+.badge {
+  display: inline-block;
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--primary);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 10px 18px;
+  border-radius: 999px;
+  margin-bottom: 24px;
+  font-weight: 700;
+}
+
+.hero-desc {
+  margin-top: 24px;
+  font-size: 1.15rem;
+  color: var(--muted);
+}
+
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.tech-stack span {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--card-border);
+  font-weight: 700;
+}
+
+.tech-stack.large span {
+  padding: 12px 22px;
+  font-size: 1.05rem;
+}
+
+.slide-number {
+  position: absolute;
+  bottom: 20px;
+  left: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
+  z-index: 5;
+}
+
+.intro-grid,
+.tech-grid,
+.models-grid,
+.advantages-grid,
+.query-points,
+.steps-grid,
+.washing-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.intro-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.info-card,
+.tech-card,
+.model-card,
+.adv-card,
+.point-card,
+.step-card,
+.wash-card,
+.code-card,
+.relation-card,
+.security-card,
+.workflow-step,
+.roles-box {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 22px;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow);
+}
+
+.info-card {
+  position: relative;
+  min-height: 150px;
+}
+
+.card-num {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+}
+
+.info-card p {
+  margin-top: 40px;
+  font-size: 1.05rem;
+}
+
+.tech-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tech-card h3 {
+  font-size: 1.4rem;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.tech-card p {
+  color: var(--muted);
+}
+
+.feature-list,
+.summary-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feature-list li,
+.summary-list li {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-right: 5px solid var(--primary);
+  padding: 18px 20px;
+  border-radius: 16px;
+  font-size: 1.05rem;
+}
+
+.steps-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 26px;
+}
+
+.step-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.step-card span {
+  min-width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--accent), #16a34a);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.db-box {
+  width: fit-content;
+  margin: 0 auto;
+  padding: 18px 36px;
+  background: linear-gradient(135deg, var(--warning), #f97316);
+  border-radius: 18px;
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #fff;
+  box-shadow: var(--shadow);
+}
+
+.models-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.model-card {
+  text-align: center;
+  font-weight: 800;
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.model-card span {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.relation-layout {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.relation-card {
+  text-align: center;
+  font-weight: 800;
+}
+
+.relation-card span {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.main-card {
+  background: linear-gradient(
+    135deg,
+    rgba(56, 189, 248, 0.18),
+    rgba(14, 165, 233, 0.18)
+  );
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.relation-note {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  padding: 18px 20px;
+}
+
+.relation-note p {
+  margin-bottom: 10px;
+}
+
+.relation-note p:last-child {
+  margin-bottom: 0;
+}
+
+.washing-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 24px;
+}
+
+.wash-card {
+  text-align: center;
+  font-weight: 800;
+}
+
+.wash-card span {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.relation-types {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.relation-type {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.relation-type.wide {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.code-card h3 {
+  margin-bottom: 14px;
+  color: var(--primary);
+}
+
+pre {
+  background: #020617;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 18px;
+  border-radius: 14px;
+  direction: ltr;
+  text-align: left;
+}
+
+code {
+  font-family: Consolas, Monaco, monospace;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+}
+
+.inline-code {
+  font-family: Consolas, Monaco, monospace;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 10px;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.bottom-note {
+  margin-top: 10px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  padding: 16px 18px;
+  border-radius: 16px;
+  color: var(--muted);
+}
+
+.query-points {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 24px;
+}
+
+.point-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.point-card span {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  font-weight: 800;
+}
+
+.code-example {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 16px;
+}
+
+.advantages-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.adv-card {
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Security */
+.security-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.security-card h3 {
+  color: var(--primary);
+  margin-bottom: 14px;
+  font-size: 1.2rem;
+}
+
+.security-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.security-card ul li {
+  background: rgba(255, 255, 255, 0.04);
+  border-right: 4px solid var(--accent);
+  padding: 12px 14px;
+  border-radius: 12px;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.security-code-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.security-code-grid h4,
+.roles-box h4,
+.login-flow-box h4 {
+  margin-bottom: 12px;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.roles-box {
+  margin-bottom: 20px;
+}
+
+.roles-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.role {
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  color: #fff;
+  display: inline-block;
+}
+
+.role.admin {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.role.employee {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+}
+
+.role.customer {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+/* Workflow */
+.workflow-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.workflow-step h3 {
+  color: var(--primary);
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.workflow-step p {
+  color: var(--muted);
+}
+
+.workflow-num {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.workflow-arrow {
+  text-align: center;
+  font-size: 2rem;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.login-flow-box {
+  margin-top: 24px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.login-flow-box p {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.thank-you-slide h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 16px;
+}
+
+.question-text {
+  font-size: 1.35rem;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+@media (max-width: 992px) {
+  .intro-grid,
+  .tech-grid,
+  .steps-grid,
+  .models-grid,
+  .relation-layout,
+  .washing-grid,
+  .relation-types,
+  .split-layout,
+  .query-points,
+  .advantages-grid,
+  .security-grid,
+  .security-code-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 16px;
+  }
+
+  .slide {
+    min-height: auto;
+    padding: 28px 18px 70px;
+    border-radius: 22px;
+  }
+
+  .slide-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .intro-grid,
+  .tech-grid,
+  .steps-grid,
+  .models-grid,
+  .relation-layout,
+  .washing-grid,
+  .relation-types,
+  .split-layout,
+  .query-points,
+  .advantages-grid,
+  .security-grid,
+  .security-code-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-slide h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero-slide h2 {
+    font-size: 1.1rem;
+  }
+
+  .tech-stack {
+    gap: 10px;
+  }
+
+  .slide-number {
+    width: 46px;
+    height: 46px;
+    font-size: 0.95rem;
+  }
+}
+    </style>
+
+  </head>
+  <body>
+    <main class="presentation">
+      <!-- Slide 1 -->
+      <section class="slide hero-slide">
+        <div class="slide-content center">
+          <span class="badge"> Backend & Database </span>
+          <h1>Database Layer - Car Management System</h1>
+          <h2>طبقة قاعدة البيانات وهيكلة البيانات وتصميم الـ ORM</h2>
+
+          <div class="tech-stack">
+            <span>Node.js</span>
+            <span>Express</span>
+            <span>MySQL</span>
+            <span>Sequelize</span>
+          </div>
+
+          <p class="hero-desc">نظام إدارة بيع السيارات ومغسلة السيارات</p>
+        </div>
+        <div class="slide-number">1</div>
+      </section>
+
+      <!-- Slide 2 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>مقدمة عن طبقة قاعدة البيانات</h2>
+        </div>
+
+        <div class="slide-content">
+          <div class="intro-grid">
+            <div class="info-card">
+              <span class="card-num">1</span>
+              <p>توضيح كيفية بناء طبقة قاعدة البيانات داخل المشروع</p>
+            </div>
+            <div class="info-card">
+              <span class="card-num">2</span>
+              <p>استخدام Sequelize ORM فوق MySQL</p>
+            </div>
+            <div class="info-card">
+              <span class="card-num">3</span>
+              <p>دمج قاعدة البيانات مع Express + Node.js</p>
+            </div>
+            <div class="info-card">
+              <span class="card-num">4</span>
+              <p>
+                تصميم الجداول والعلاقات لإدارة بيع وشراء السيارات وخدمات الغسيل
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-number">2</div>
+      </section>
+
+      <!-- Slide 3 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>التقنيات المستخدمة في الـ Backend</h2>
+        </div>
+
+        <div class="slide-content">
+          <div class="tech-grid">
+            <div class="tech-card">
+              <h3>Node.js</h3>
+              <p>بيئة تشغيل JavaScript على الخادم</p>
+            </div>
+
+            <div class="tech-card">
+              <h3>Express</h3>
+              <p>إطار عمل لإدارة الـ API والمسارات</p>
+            </div>
+
+            <div class="tech-card">
+              <h3>MySQL</h3>
+              <p>قاعدة بيانات علائقية لتخزين البيانات</p>
+            </div>
+
+            <div class="tech-card">
+              <h3>Sequelize</h3>
+              <p>ORM يربط بين JavaScript وقاعدة البيانات</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-number">3</div>
+      </section>
+
+      <!-- Slide 4 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>سبب اختيار Sequelize</h2>
+        </div>
+
+        <div class="slide-content">
+          <ul class="feature-list">
+            <li>تحويل الجداول إلى Models داخل JavaScript</li>
+            <li>تعريف العلاقات بين الجداول بسهولة</li>
+            <li>تقليل الحاجة لكتابة SQL يدويًا</li>
+            <li>التحقق من صحة البيانات قبل حفظها</li>
+            <li>
+              تنفيذ الاستعلامات بأوامر مثل:
+              <span class="inline-code">findAll / create / update / include</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="slide-number">4</div>
+      </section>
+
+      <!-- Slide 5 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>ربط Sequelize مع MySQL</h2>
+        </div>
+
+        <div class="slide-content">
+          <div class="steps-grid">
+            <div class="step-card">
+              <span>١</span>
+              <p>إنشاء Sequelize Instance واحدة للمشروع</p>
+            </div>
+            <div class="step-card">
+              <span>٢</span>
+              <p>تحديد اسم قاعدة البيانات وبيانات الاتصال</p>
+            </div>
+            <div class="step-card">
+              <span>٣</span>
+              <p>التحقق من نجاح الاتصال باستخدام authenticate()</p>
+            </div>
+            <div class="step-card">
+              <span>٤</span>
+              <p>مزامنة الـ Models مع الجداول داخل MySQL باستخدام sync()</p>
+            </div>
+          </div>
+
+          <div class="db-box">MySQL</div>
+        </div>
+
+        <div class="slide-number">5</div>
+      </section>
+
+      <!-- Slide 6 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>النماذج الأساسية في النظام</h2>
+        </div>
+
+        <div class="slide-content">
+          <div class="models-grid">
+            <div class="model-card">Customer <span>بيانات العميل</span></div>
+            <div class="model-card">Employee <span>بيانات الموظف</span></div>
+            <div class="model-card">Car <span>بيانات السيارة</span></div>
+            <div class="model-card">Sale <span>عملية بيع سيارة</span></div>
+            <div class="model-card">Purchase <span>عملية شراء سيارة</span></div>
+            <div class="model-card">Payment <span>المدفوعات والمعاملات</span></div>
+            <div class="model-card">WashingOrder <span>طلب الغسيل</span></div>
+            <div class="model-card">Washing <span>عملية الغسيل</span></div>
+          </div>
+        </div>
+
+        <div class="slide-number">6</div>
+      </section>
+
+      <!-- Slide 7 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>وحدة البيع والشراء — العلاقات</h2>
+        </div>
+
+        <div class="slide-content">
+          <div class="relation-layout">
+            <div class="relation-card">Customer <span>العميل</span></div>
+            <div class="relation-card">Employee <span>الموظف</span></div>
+            <div class="relation-card">Car <span>السيارة</span></div>
+            <div class="relation-card main-card">
+              Sale / Purchase
+              <span>عملية البيع / الشراء</span>
+            </div>
+            <div class="relation-card">Payment <span>الدفعة</span></div>
+          </div>
+
+          <div class="relation-note">
+            <p>
+              <strong>المفاتيح الأجنبية:</strong> id_customer · id_employee ·
+              car_id
+            </p>
+            <p><strong>العلاقة الأساسية:</strong> One To Many</p>
+          </div>
+        </div>
+
+        <div class="slide-number">7</div>
+      </section>
+
+      <!-- Slide 8 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>وحدة الغسيل — العلاقات</h2>
+        </div>
+
+        <div class="slide-content">
+          <div class="washing-grid">
+            <div class="wash-card">WashingOrder <span>طلب الغسيل</span></div>
+            <div class="wash-card">Washing <span>عملية الغسيل</span></div>
+            <div class="wash-card">
+              WashingMaterial <span>مواد الغسيل</span>
+            </div>
+            <div class="wash-card">Customer <span>العميل</span></div>
+            <div class="wash-card">Employee <span>الموظف</span></div>
+            <div class="wash-card">Service <span>الخدمة</span></div>
+          </div>
+
+          <div class="relation-types">
+            <div class="relation-type">One To One</div>
+            <div class="relation-type">Many To Many</div>
+            <div class="relation-type wide">
+              جدول وسيط لربط الغسيل بالمواد المستخدمة
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-number">8</div>
+      </section>
+
+      <!-- Slide 9 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>تطبيق العلاقات في Sequelize</h2>
+        </div>
+
+        <div class="slide-content split-layout">
+          <div class="code-card">
+            <h3>One To Many</h3>
+            <pre><code>Customer.hasMany(Sale)
+Sale.belongsTo(Customer)</code></pre>
+          </div>
+
+          <div class="code-card">
+            <h3>Many To Many</h3>
+            <pre><code>Washing.belongsToMany(WashingMaterial, {
+  through: JunctionTable
+})</code></pre>
+          </div>
+        </div>
+
+        <div class="bottom-note">
+          يُسهّل استدعاء البيانات المرتبطة ويجعل الكود أوضح وأسهل في الصيانة —
+          كما أن <span class="inline-code">include</span> تعمل مثل
+          <span class="inline-code">JOIN</span> في SQL
+        </div>
+
+        <div class="slide-number">9</div>
+      </section>
+
+      <!-- Slide 10 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>الاستعلام عبر العلاقات</h2>
+        </div>
+
+        <div class="slide-content">
+          <div class="query-points">
+            <div class="point-card">
+              <span>1</span>
+              <p>استخدام include لجلب البيانات المرتبطة من أكثر من جدول</p>
+            </div>
+            <div class="point-card">
+              <span>2</span>
+              <p>
+                يمكن إرجاع بيانات العميل والموظف والخدمة وعملية الغسيل والمواد
+                المستخدمة
+              </p>
+            </div>
+            <div class="point-card">
+              <span>3</span>
+              <p>include تعمل مثل JOIN في SQL</p>
+            </div>
+            <div class="point-card">
+              <span>4</span>
+              <p>تقلل عدد الاستعلامات وتجعل الكود أكثر تنظيمًا</p>
+            </div>
+          </div>
+
+          <div class="code-example">
+            <pre><code>WashingOrder.findAll({
+  include: [
+    Customer,
+    Employee,
+    Service,
+    Washing,
+    WashingMaterial
+  ]
+})</code></pre>
+          </div>
+        </div>
+
+        <div class="slide-number">10</div>
+      </section>
+
+      <!-- Slide 11 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>مميزات طبقة البيانات</h2>
+        </div>
+
+        <div class="slide-content">
+          <div class="advantages-grid">
+            <div class="adv-card">تنظيم جميع بيانات النظام في Models واضحة</div>
+            <div class="adv-card">تعريف العلاقات بشكل دقيق ومرن</div>
+            <div class="adv-card">تسهيل عمليات الإضافة والتعديل والاستعلام</div>
+            <div class="adv-card">تقليل تعقيد كتابة SQL يدويًا</div>
+            <div class="adv-card">دعم قابلية التوسع والصيانة مستقبلًا</div>
+          </div>
+        </div>
+
+        <div class="slide-number">11</div>
+      </section>
+
+      <!-- Slide 12 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>Authentication & Security Layer</h2>
+        </div>
+
+        <div class="slide-content">
+          <div class="security-grid">
+            <div class="security-card">
+              <h3>1) bcrypt — تشفير كلمة المرور</h3>
+              <ul>
+                <li>يتم تشفير كلمة المرور قبل حفظها في قاعدة البيانات.</li>
+                <li>
+                  عدم تخزين كلمة المرور كنص عادي
+                  <span class="inline-code">Plain Text</span>.
+                </li>
+                <li>
+                  استخدام <span class="inline-code">bcrypt.hash()</span> أثناء
+                  التسجيل.
+                </li>
+                <li>
+                  استخدام <span class="inline-code">bcrypt.compare()</span> أثناء
+                  تسجيل الدخول.
+                </li>
+              </ul>
+            </div>
+
+            <div class="security-card">
+              <h3>2) JWT — Authentication</h3>
+              <ul>
+                <li>
+                  بعد نجاح تسجيل الدخول يتم إنشاء
+                  <span class="inline-code">Token</span> للمستخدم.
+                </li>
+                <li>
+                  يُرسل الـ Token للعميل ويُستخدم في الطلبات المحمية.
+                </li>
+                <li>
+                  يحتوي الـ Token على بيانات أساسية مثل
+                  <span class="inline-code">userId</span> و
+                  <span class="inline-code">role</span>.
+                </li>
+                <li>
+                  يتم التحقق منه في الـ Middleware قبل السماح بالوصول للـ API.
+                </li>
+              </ul>
+            </div>
+
+            <div class="security-card">
+              <h3>3) Roles — Authorization</h3>
+              <ul>
+                <li>تحديد صلاحيات كل مستخدم حسب دوره داخل النظام.</li>
+                <li><strong>Admin:</strong> إدارة النظام بالكامل.</li>
+                <li>
+                  <strong>Employee:</strong> إدارة العمليات اليومية مثل البيع
+                  والغسيل.
+                </li>
+                <li>
+                  <strong>Customer:</strong> الوصول إلى بياناته وخدماته فقط.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="security-code-grid">
+            <div class="code-example">
+              <h4>bcrypt Example</h4>
+              <pre><code>const bcrypt = require("bcrypt");
+
+const hashedPassword = await bcrypt.hash(password, 10);
+
+const isMatch=await bcrypt.compare(password,user.password);</code></pre>
+            </div>
+
+            <div class="code-example">
+              <h4>JWT Example</h4>
+              <pre><code>const jwt = require("jsonwebtoken");
+
+const token = jwt.sign(
+  { userId: user.id, role: user.role },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+);</code></pre>
+            </div>
+          </div>
+
+          <div class="roles-box">
+            <h4>Role-based Access Example</h4>
+            <div class="roles-list">
+              <span class="role admin">Admin</span>
+              <span class="role employee">Employee</span>
+              <span class="role customer">Customer</span>
+            </div>
+            <p>
+              يتم استخدام الـ <span class="inline-code">role</span> داخل الـ
+              Middleware لتحديد من يمكنه تنفيذ عمليات مثل إضافة سيارة أو حذف
+              موظف أو عرض تقارير النظام.
+            </p>
+          </div>
+
+          <div class="bottom-note">
+            طبقة الأمان في النظام لا تعتمد فقط على قاعدة البيانات، بل تشمل أيضًا
+            <span class="inline-code">Password Hashing</span> و
+            <span class="inline-code">JWT Authentication</span> و
+            <span class="inline-code">Role-based Authorization</span>
+            لحماية المستخدمين والعمليات الحساسة داخل النظام.
+          </div>
+        </div>
+
+        <div class="slide-number">12</div>
+      </section>
+
+      <!-- Slide 13 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>Workflow of Login System</h2>
+        </div>
+
+        <div class="slide-content">
+          <div class="workflow-steps">
+            <div class="workflow-step">
+              <span class="workflow-num">1</span>
+              <h3>إدخال البيانات</h3>
+              <p>يقوم المستخدم بإدخال البريد الإلكتروني وكلمة المرور.</p>
+            </div>
+
+            <div class="workflow-arrow">⬇</div>
+
+            <div class="workflow-step">
+              <span class="workflow-num">2</span>
+              <h3>البحث عن المستخدم</h3>
+              <p>
+                السيرفر يبحث داخل قاعدة البيانات عن المستخدم باستخدام
+                <span class="inline-code">email</span>.
+              </p>
+            </div>
+
+            <div class="workflow-arrow">⬇</div>
+
+            <div class="workflow-step">
+              <span class="workflow-num">3</span>
+              <h3>مقارنة كلمة المرور</h3>
+              <p>
+                تتم مقارنة كلمة المرور المدخلة مع كلمة المرور المشفرة باستخدام
+                <span class="inline-code">bcrypt.compare()</span>.
+              </p>
+            </div>
+
+            <div class="workflow-arrow">⬇</div>
+
+            <div class="workflow-step">
+              <span class="workflow-num">4</span>
+              <h3>إنشاء JWT</h3>
+              <p>
+                إذا كانت البيانات صحيحة يتم إنشاء
+                <span class="inline-code">JWT Token</span> يحتوي على
+                <span class="inline-code">userId</span> و
+                <span class="inline-code">role</span>.
+              </p>
+            </div>
+
+            <div class="workflow-arrow">⬇</div>
+
+            <div class="workflow-step">
+              <span class="workflow-num">5</span>
+              <h3>إرسال الـ Token</h3>
+              <p>
+                يتم إرسال الـ Token إلى الـ Client ليتم حفظه واستخدامه لاحقًا في
+                الطلبات المحمية.
+              </p>
+            </div>
+
+            <div class="workflow-arrow">⬇</div>
+
+            <div class="workflow-step">
+              <span class="workflow-num">6</span>
+              <h3>حماية الـ Routes</h3>
+              <p>
+                عند أي طلب محمي يتم إرسال الـ Token داخل
+                <span class="inline-code">Authorization Header</span>.
+              </p>
+            </div>
+
+            <div class="workflow-arrow">⬇</div>
+
+            <div class="workflow-step">
+              <span class="workflow-num">7</span>
+              <h3>التحقق من الصلاحيات</h3>
+              <p>
+                يقوم الـ Middleware بفك التوكن والتحقق من هوية المستخدم ودوره
+                <span class="inline-code">role</span> قبل تنفيذ العملية.
+              </p>
+            </div>
+          </div>
+
+          <div class="login-flow-box">
+            <h4>Login Flow Summary</h4>
+            <p>
+              User Login → Find User → Compare Password → Generate JWT → Send
+              Token → Protect Routes → Check Role
+            </p>
+          </div>
+        </div>
+
+        <div class="slide-number">13</div>
+      </section>
+
+      <!-- Slide 14 -->
+      <section class="slide">
+        <div class="slide-header">
+          <h2>الخلاصة</h2>
+        </div>
+
+        <div class="slide-content">
+          <ul class="summary-list">
+            <li>تم بناء طبقة قاعدة البيانات باستخدام Sequelize + MySQL</li>
+            <li>تم تصميم 10 Models تغطي جميع أجزاء المشروع</li>
+            <li>تم تعريف العلاقات بين الجداول حسب طبيعة النظام</li>
+            <li>تم استخدام include لجلب البيانات المترابطة بكفاءة</li>
+            <li>
+              تم دعم النظام بطبقة أمان تشمل bcrypt و JWT و Role-based Access
+              Control
+            </li>
+            <li>
+              التصميم الحالي يوفر قاعدة بيانات منظمة ومرنة وقابلة للتطوير
+            </li>
+          </ul>
+        </div>
+
+        <div class="slide-number">14</div>
+      </section>
+
+      <!-- Slide 15 -->
+      <section class="slide thank-you-slide">
+        <div class="slide-content center">
+          <h2>Database</h2>
+          <p class="question-text">Backend</p>
+
+          <div class="tech-stack large">
+            <span>Node.js</span>
+            <span>Express</span>
+            <span>MySQL</span>
+            <span>Sequelize</span>
+          </div>
+        </div>
+
+        <div class="slide-number">15</div>
+      </section>
+    </main>
+  </body>
+</html>
